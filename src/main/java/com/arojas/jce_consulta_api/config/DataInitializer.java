@@ -79,17 +79,16 @@ public class DataInitializer implements ApplicationRunner {
 			logger.info("Creando usuario ADMIN por defecto...");
 
 			User admin = new User();
-			admin.setId(UUID.randomUUID().toString());
 			admin.setName("Administrador Root");
 			admin.setEmail(adminEmail);
 			admin.setPassword(passwordEncoder.encode("Emulador1"));
 			admin.setRole(User.Role.ADMIN);
 			admin.setTokens(100);
 			admin.setIsActive(true);
-			admin.setCreatedAt(LocalDateTime.now());
-			admin.setUpdatedAt(LocalDateTime.now());
-
 			userRepository.save(admin);
+
+			userRepository.saveAndFlush(admin);
+
 			logger.info("Usuario ADMIN creado con email: {}", adminEmail);
 		} else {
 			logger.info("Usuario ADMIN ya existe con email: {}", adminEmail);
