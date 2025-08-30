@@ -27,4 +27,7 @@ public interface EmailTemplateRepository extends JpaRepository<EmailTemplate, St
 
 	List<EmailTemplate> findByIsActiveTrueOrderByName();
 
+	int countByIsActiveTrue();
+
+	List<EmailTemplate> findByTypeAndIsActiveTrueOrderByCreatedAtDesc(EmailTemplate.TemplateType type);
 }

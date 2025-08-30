@@ -49,10 +49,10 @@ public class PaymentService {
 	private final EmailService emailService;
 
 	// Configuration
-	@Value("${app.buymeacoffee.base-url")
+	@Value("${app.payment.buymeacoffee.base-url}")
 	private String buyMeACoffeeBaseUrl;
 
-	@Value("${app.buymeacoffee.username}")
+	@Value("${app.payment.buymeacoffee.username:}")
 	private String buyMeACoffeeUsername;
 
 	@Value("${app.payment.verification.enabled}")

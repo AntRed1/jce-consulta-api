@@ -5,7 +5,6 @@
 
 package com.arojas.jce_consulta_api.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
@@ -26,15 +25,12 @@ import lombok.Data;
 public class JceConfigurationProperties {
 
 	@NotBlank(message = "La URL base de JCE es requerida")
-	@Value("${app.jce.base-url}")
 	private String baseUrl;
 
 	@NotBlank(message = "El Service ID de JCE es requerido")
-	@Value("${app.jce.service-id}")
 	private String serviceId;
 
 	@NotBlank(message = "El endpoint de JCE es requerido")
-	@Value("${app.jce.endpoint}")
 	private String endpoint;
 
 	private Timeout timeout = new Timeout();

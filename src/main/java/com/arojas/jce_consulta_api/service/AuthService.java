@@ -113,7 +113,7 @@ public class AuthService {
 
             try {
                 // EmailService espera (String userEmail, String userName, String ipAddress)
-                emailService.sendLoginNotificationEmail(user.getEmail(), user.getName(), "Unknown");
+                emailService.sendLoginNotificationEmail(user.getEmail(), user.getName(), "Unknown", accessToken);
             } catch (Exception e) {
                 log.warn("Failed to send login notification email to: {}", user.getEmail(), e);
             }
@@ -138,6 +138,7 @@ public class AuthService {
 
         // Corregido: usar getExpiryDate() en lugar de getexpiryDate()
         if (refreshToken.getexpiryDate().isBefore(LocalDateTime.now())) {
+
             refreshTokenRepository.delete(refreshToken);
             throw new IllegalArgumentException("Refresh token expirado");
         }

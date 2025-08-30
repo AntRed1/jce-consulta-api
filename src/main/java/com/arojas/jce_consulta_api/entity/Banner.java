@@ -6,7 +6,6 @@
 package com.arojas.jce_consulta_api.entity;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -14,6 +13,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -21,6 +22,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  *
@@ -32,11 +34,13 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class Banner {
 
 	@Id
-	@Column(name = "id", columnDefinition = "VARCHAR(36)")
-	private String id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "app_settings_id", nullable = false)
@@ -73,106 +77,4 @@ public class Banner {
 	@UpdateTimestamp
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
-
-	// Constructors
-	public Banner() {
-		this.id = UUID.randomUUID().toString();
-	}
-
-	// Getters and Setters
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public AppSettings getAppSettings() {
-		return appSettings;
-	}
-
-	public void setAppSettings(AppSettings appSettings) {
-		this.appSettings = appSettings;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public String getButtonText() {
-		return buttonText;
-	}
-
-	public void setButtonText(String buttonText) {
-		this.buttonText = buttonText;
-	}
-
-	public String getButtonUrl() {
-		return buttonUrl;
-	}
-
-	public void setButtonUrl(String buttonUrl) {
-		this.buttonUrl = buttonUrl;
-	}
-
-	public String getBackgroundColor() {
-		return backgroundColor;
-	}
-
-	public void setBackgroundColor(String backgroundColor) {
-		this.backgroundColor = backgroundColor;
-	}
-
-	public String getTextColor() {
-		return textColor;
-	}
-
-	public void setTextColor(String textColor) {
-		this.textColor = textColor;
-	}
-
-	public Boolean getIsActive() {
-		return isActive;
-	}
-
-	public void setIsActive(Boolean isActive) {
-		this.isActive = isActive;
-	}
-
-	public Integer getPriority() {
-		return priority;
-	}
-
-	public void setPriority(Integer priority) {
-		this.priority = priority;
-	}
-
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-
-	public LocalDateTime getUpdatedAt() {
-		return updatedAt;
-	}
-
-	public void setUpdatedAt(LocalDateTime updatedAt) {
-		this.updatedAt = updatedAt;
-	}
 }
