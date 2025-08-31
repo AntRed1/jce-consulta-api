@@ -32,28 +32,28 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class EmailService {
 
-	private final JavaMailSender mailSender;
 	private final AppSettingsService appSettingsService;
+	private final JavaMailSender mailSender;
 
-	@Value("${app.email.from:noreply@jce-consulta.com}")
+	@Value("${app.email.from}")
 	private String fromEmail;
 
-	@Value("${app.email.enabled:true}")
+	@Value("${app.email.enabled}")
 	private boolean emailEnabled;
 
-	@Value("${app.name:JCE Consulta}")
+	@Value("${app.name}")
 	private String appName;
 
 	// ================= MÉTODOS PÚBLICOS =================
 
-	@Async
+	@Async("emailExecutor")
 	public CompletableFuture<Void> sendWelcomeEmail(String userEmail, String userName) {
 		return sendEmailFromTemplate(userEmail, TemplateType.WELCOME, Map.of(
 				"userName", userName,
 				"appName", appName));
 	}
 
-	@Async
+	@Async("emailExecutor")
 	public CompletableFuture<Void> sendLoginNotificationEmail(String userEmail, String userName, String ipAddress,
 			String deviceInfo) {
 		return sendEmailFromTemplate(userEmail, TemplateType.LOGIN, Map.of(
@@ -64,7 +64,7 @@ public class EmailService {
 				"loginDateTime", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))));
 	}
 
-	@Async
+	@Async("emailExecutor")
 	public CompletableFuture<Void> sendPaymentConfirmationEmail(String userEmail, PaymentOrder paymentOrder) {
 		LocalDateTime paymentDate = paymentOrder.getUpdatedAt() != null ? paymentOrder.getUpdatedAt()
 				: LocalDateTime.now();
@@ -76,7 +76,7 @@ public class EmailService {
 				"paymentDate", paymentDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))));
 	}
 
-	@Async
+	@Async("emailExecutor")
 	public CompletableFuture<Void> sendAdminNotificationEmail(String adminEmail, String message) {
 		return sendEmailFromTemplate(adminEmail, TemplateType.ADMIN_LOGIN, Map.of(
 				"appName", appName,
@@ -84,7 +84,7 @@ public class EmailService {
 				"notificationTime", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))));
 	}
 
-	@Async
+	@Async("emailExecutor")
 	public CompletableFuture<Void> sendCustomEmail(String userEmail, String subject, String content) {
 		return CompletableFuture.runAsync(() -> {
 			try {

@@ -104,12 +104,15 @@ public class AuthController {
 		log.info("Solicitud de login para email: {}", credentials.getEmail());
 
 		try {
-			// Obtener IP del cliente (para logging, pero no se pasa al service)
+			// Obtener IP real del cliente
 			String clientIp = getClientIpAddress(request);
-			log.info("Login desde IP: {}", clientIp);
+			// Capturar User-Agent del navegador/dispositivo
+			String deviceInfo = request.getHeader("User-Agent");
 
-			// Autenticar usuario - solo pasa LoginCredentials
-			AuthResponse authResponse = authService.login(credentials);
+			log.info("Login desde IP: {}, dispositivo: {}", clientIp, deviceInfo);
+
+			// Llamada al AuthService pasando IP y dispositivo
+			AuthResponse authResponse = authService.login(credentials, clientIp, deviceInfo);
 
 			ApiResponse<AuthResponse> response = ApiResponse.<AuthResponse>builder()
 					.success(true)
@@ -117,7 +120,6 @@ public class AuthController {
 					.message("Login exitoso")
 					.build();
 
-			log.info("Login exitoso para: {}", credentials.getEmail());
 			return ResponseEntity.ok(response);
 
 		} catch (Exception e) {

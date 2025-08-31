@@ -33,9 +33,10 @@ import lombok.Data;
 @AllArgsConstructor
 public class RefreshToken {
 
+	@Builder.Default
 	@Id
 	@Column(name = "id", columnDefinition = "VARCHAR(36)")
-	private String id;
+	private String id = UUID.randomUUID().toString();
 
 	@Column(name = "token", nullable = false, unique = true, columnDefinition = "TEXT")
 	private String token;
@@ -47,6 +48,7 @@ public class RefreshToken {
 	@Column(name = "expires_at", nullable = false)
 	private LocalDateTime expiryDate;
 
+	@Builder.Default
 	@Column(name = "is_revoked", nullable = false)
 	private Boolean isRevoked = false;
 

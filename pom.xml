@@ -204,6 +204,19 @@
 			<version>8.9.0</version>
 		</dependency>
 
+		<!-- AspectJ for AOP -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+
+		<!-- Hibernate types for JSON support -->
+		<dependency>
+			<groupId>io.hypersistence</groupId>
+			<artifactId>hypersistence-utils-hibernate-60</artifactId>
+			<version>3.5.1</version>
+		</dependency>
+
 		<!-- ========================================== -->
 		<!-- API Documentation -->
 		<!-- ========================================== -->
@@ -316,11 +329,6 @@
 		<dependency>
 			<groupId>org.springframework.retry</groupId>
 			<artifactId>spring-retry</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-aop</artifactId>
 		</dependency>
 
 	</dependencies>

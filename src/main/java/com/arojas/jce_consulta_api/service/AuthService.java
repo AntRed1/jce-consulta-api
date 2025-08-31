@@ -86,11 +86,10 @@ public class AuthService {
                 .build();
     }
 
-    public AuthResponse login(LoginCredentials credentials) {
+    public AuthResponse login(LoginCredentials credentials, String clientIp, String deviceInfo) {
         log.info("Login attempt for email: {}", credentials.getEmail());
 
         try {
-            // No asignamos la autenticación a una variable que no usemos (evita la hint)
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             credentials.getEmail(),
@@ -99,11 +98,11 @@ public class AuthService {
             User user = userRepository.findByEmail(credentials.getEmail())
                     .orElseThrow(() -> new BadCredentialsException("Usuario no encontrado"));
 
-            // Usa el getter generado por Lombok para Boolean: getIsActive()
             if (user.getIsActive() == null || !user.getIsActive()) {
                 throw new BadCredentialsException("Usuario inactivo");
             }
 
+            // Revocar tokens antiguos
             revokeAllUserTokens(user);
 
             String accessToken = jwtService.generateToken(createUserDetails(user));
@@ -111,11 +110,15 @@ public class AuthService {
 
             log.info("User logged in successfully: {}", user.getEmail());
 
+            // Enviar email de login con IP y dispositivo
             try {
-                // EmailService espera (String userEmail, String userName, String ipAddress)
-                emailService.sendLoginNotificationEmail(user.getEmail(), user.getName(), "Unknown", accessToken);
+                emailService.sendLoginNotificationEmail(
+                        user.getEmail(),
+                        user.getName(),
+                        clientIp != null ? clientIp : "Desconocida",
+                        deviceInfo != null ? deviceInfo : "Desconocido");
             } catch (Exception e) {
-                log.warn("Failed to send login notification email to: {}", user.getEmail(), e);
+                log.warn("No se pudo enviar email de notificación de login a {}: {}", user.getEmail(), e.getMessage());
             }
 
             return AuthResponse.builder()
