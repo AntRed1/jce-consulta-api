@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.arojas.jce_consulta_api.dto.UserDto;
 import com.arojas.jce_consulta_api.dto.request.LoginCredentials;
 import com.arojas.jce_consulta_api.dto.request.RegisterData;
 import com.arojas.jce_consulta_api.dto.response.ApiResponse;
 import com.arojas.jce_consulta_api.dto.response.AuthResponse;
-import com.arojas.jce_consulta_api.service.AuthService;
 import com.arojas.jce_consulta_api.entity.User;
-import com.arojas.jce_consulta_api.dto.UserDto;
+import com.arojas.jce_consulta_api.service.AuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -309,6 +309,16 @@ public class AuthController {
 	@Operation(summary = "Información del usuario actual", description = "Obtiene la información del usuario autenticado")
 	@GetMapping("/me")
 	public ResponseEntity<ApiResponse<AuthResponse>> getCurrentUser(Authentication authentication) {
+		if (authentication == null || !authentication.isAuthenticated()) {
+			log.warn("No authenticated user for /api/v1/auth/me request");
+			ApiResponse<AuthResponse> response = ApiResponse.<AuthResponse>builder()
+					.success(false)
+					.data(null)
+					.message("No authenticated user")
+					.error("Authentication required")
+					.build();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+		}
 
 		String userEmail = authentication.getName();
 		log.debug("Obteniendo información del usuario actual: {}", userEmail);
@@ -340,7 +350,7 @@ public class AuthController {
 					.error(e.getMessage())
 					.build();
 
-			return ResponseEntity.badRequest().body(response);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		}
 	}
 

@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.data.domain.Page;
@@ -229,8 +231,36 @@ public class CedulaQueryService {
 
 	private CedulaResult buildCedulaResult(CedulaResultDto resultDto) {
 		LocalDate fechaNac = null;
-		if (resultDto.getFechaNacimiento() != null && !resultDto.getFechaNacimiento().isEmpty())
-			fechaNac = LocalDate.parse(resultDto.getFechaNacimiento(), DateTimeFormatter.ISO_DATE);
+
+		if (resultDto.getFechaNacimiento() != null && !resultDto.getFechaNacimiento().isEmpty()) {
+			try {
+				// Formato que viene del JCE: M/d/yyyy h:mm:ss a
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yyyy h:mm:ss a", Locale.ENGLISH);
+
+				// Primero parseamos a LocalDateTime, luego extraemos la fecha
+				LocalDateTime dateTime = LocalDateTime.parse(resultDto.getFechaNacimiento(), formatter);
+				fechaNac = dateTime.toLocalDate();
+
+			} catch (DateTimeParseException e) {
+				log.error("No se pudo parsear la fecha: {}", resultDto.getFechaNacimiento(), e);
+
+				// Intentar formatos alternativos como fallback
+				String dateOnly = null;
+				try {
+					if (resultDto.getFechaNacimiento().contains(" ")) {
+						dateOnly = resultDto.getFechaNacimiento().split(" ")[0]; // Tomar solo la parte de la fecha
+					} else {
+						dateOnly = resultDto.getFechaNacimiento(); // Usar la fecha completa si no hay espacio
+					}
+					DateTimeFormatter simpleFormatter = DateTimeFormatter.ofPattern("M/d/yyyy");
+					fechaNac = LocalDate.parse(dateOnly, simpleFormatter);
+					log.info("Fecha parseada exitosamente con formato alternativo: {}", fechaNac);
+				} catch (Exception fallbackException) {
+					log.error("Tampoco se pudo parsear con formato alternativo: {}",
+							dateOnly != null ? dateOnly : "null", fallbackException);
+				}
+			}
+		}
 
 		return CedulaResult.builder()
 				.nombres(resultDto.getNombres())

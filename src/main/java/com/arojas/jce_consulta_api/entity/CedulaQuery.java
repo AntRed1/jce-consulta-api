@@ -18,6 +18,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -40,9 +41,10 @@ import lombok.Data;
 public class CedulaQuery {
 
 	@Id
-	@Column(name = "id", columnDefinition = "VARCHAR(36)")
+	@GeneratedValue(generator = "UUID")
+	@org.hibernate.annotations.GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+	@Column(name = "id", updatable = false, nullable = false)
 	private String id;
-
 	@Column(name = "cedula", nullable = false, length = 20)
 	private String cedula;
 

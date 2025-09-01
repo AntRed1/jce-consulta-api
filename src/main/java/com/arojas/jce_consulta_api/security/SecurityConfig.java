@@ -58,6 +58,13 @@ public class SecurityConfig {
 				.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 				.authorizeHttpRequests(authz -> authz
 						// ============= RUTAS PÚBLICAS (Sin Autenticación) =============
+						.requestMatchers(
+								"/api/v1/auth/login",
+								"/api/v1/auth/register",
+								"/api/v1/auth/refresh",
+								"/api/v1/auth/logout",
+								"/api/v1/auth/validate")
+						.permitAll()
 						.requestMatchers(getPublicEndpoints()).permitAll()
 
 						// ============= RUTAS DE DOCUMENTACIÓN =============
@@ -66,8 +73,19 @@ public class SecurityConfig {
 						// ============= RUTAS DE MONITOREO =============
 						.requestMatchers(getMonitoringEndpoints()).permitAll()
 
+						// ============= CONFIGURACIONES PÚBLICAS =============
+						.requestMatchers(HttpMethod.GET, "/api/v1/settings/public/**").permitAll()
+						.requestMatchers(HttpMethod.GET, "/api/v1/settings/app/**").permitAll()
+						.requestMatchers(HttpMethod.GET, "/api/v1/settings/general/**").permitAll()
+
 						// ============= RUTAS ADMINISTRATIVAS (Solo ADMIN) =============
-						.requestMatchers(getAdminEndpoints()).hasRole("ADMIN")
+						.requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
+						// ============= RESTO DE CONFIGURACIONES (Admin solamente) =============
+						.requestMatchers(HttpMethod.GET, "/api/v1/settings/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.POST, "/api/v1/settings/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.PUT, "/api/v1/settings/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.DELETE, "/api/v1/settings/**").hasRole("ADMIN")
 
 						// ============= RUTAS DE LOGS (ADMIN y USER con permisos) =============
 						.requestMatchers(HttpMethod.GET, "/api/v1/logs/**").hasAnyRole("ADMIN", "USER")
@@ -85,12 +103,9 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.POST, "/api/v1/payments/**").hasAnyRole("USER", "ADMIN")
 						.requestMatchers(HttpMethod.GET, "/api/v1/payments/my-payments").hasAnyRole("USER", "ADMIN")
 
-						// ============= CONFIGURACIONES (Lectura pública, escritura admin)
-						// =============
-						.requestMatchers(HttpMethod.GET, "/api/v1/settings/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/api/v1/settings/**").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.PUT, "/api/v1/settings/**").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.DELETE, "/api/v1/settings/**").hasRole("ADMIN")
+						// ============= RUTAS DE AUTENTICACIÓN QUE REQUIEREN TOKEN =============
+						.requestMatchers("/api/v1/auth/me").hasAnyRole("USER", "ADMIN")
+						.requestMatchers("/api/v1/auth/change-password").hasAnyRole("USER", "ADMIN")
 
 						// ============= CUALQUIER OTRA RUTA (Requiere autenticación) =============
 						.anyRequest().authenticated())
@@ -106,11 +121,13 @@ public class SecurityConfig {
 	 */
 	private String[] getPublicEndpoints() {
 		return new String[] {
-				// Autenticación
-				"/api/v1/auth/**",
-
 				// Rutas públicas generales
 				"/api/v1/public/**",
+
+				// Settings públicos
+				"/api/v1/settings/public/**",
+				"/api/v1/settings/app/**",
+				"/api/v1/settings/general/**",
 
 				// Health check básico
 				"/api/v1/health",
@@ -118,7 +135,7 @@ public class SecurityConfig {
 				// Información de la aplicación
 				"/api/v1/info",
 
-				// Webhooks de pagos (para servicios externos)
+				// Webhooks de pagos
 				"/api/v1/webhooks/**",
 
 				// Página de inicio o landing
@@ -126,7 +143,7 @@ public class SecurityConfig {
 				"/index.html",
 				"/favicon.ico",
 
-				// Recursos estáticos (si los tienes)
+				// Recursos estáticos
 				"/static/**",
 				"/assets/**",
 				"/images/**",

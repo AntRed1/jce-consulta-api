@@ -21,7 +21,7 @@ import lombok.Data;
 
 @Data
 @Validated
-@ConfigurationProperties(prefix = "app.jce")
+@ConfigurationProperties(prefix = "app.jce.*")
 public class JceConfigurationProperties {
 
 	@NotBlank(message = "La URL base de JCE es requerida")
